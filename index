@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini App - Watch Video for Reward</title>
+</head>
+<body>
+  <h1>Selamat datang di Mini App!</h1>
+  <p>Silakan menonton video selama 1 menit dan dapatkan reward!</p>
+
+  <!-- Video player dengan tombol skip yang akan disembunyikan saat video diputar -->
+  <video id="video-player" width="640" height="360" controls>
+    <!-- Custom Video Link, bisa diganti dengan video lain -->
+    <source src="https://www.youtube.com/watch?v=6Y_VaEjhCG0&t=2s" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- Tombol untuk melanjutkan atau menskip video (dibelakang layar) -->
+  <button id="skip-button" style="display:none;" onclick="skipVideo()">Skip Video</button>
+
+  <script>
+    // Daftar video yang bisa dipilih secara acak
+    const videoLinks = [
+      "https://www.youtube.com/watch?v=3L4Qcq07LCY", // Ganti dengan link video 1
+      "https://www.youtube.com/watch?v=MzKpGbYFhhc&t=1s", // Ganti dengan link video 2
+      "https://www.youtube.com/watch?v=pw4LdlA9bkU&t=5s"  // Ganti dengan link video 3
+    ];
+
+    // Pilih video secara acak
+    const videoPlayer = document.getElementById("video-player");
+    const randomVideo = videoLinks[Math.floor(Math.random() * videoLinks.length)];
+    videoPlayer.src = randomVideo;
+
+    // Variabel untuk mengontrol status video yang ditonton
+    let isVideoWatched = false;
+    let isVideoSkipped = false;
+
+    // Fungsi untuk memulai video
+    videoPlayer.onplay = function() {
+      // Reset status
+      isVideoWatched = false;
+      isVideoSkipped = false;
+
+      // Sembunyikan tombol skip
+      document.getElementById("skip-button").style.display = "none";
+
+      // Mulai hitung durasi setelah video mulai diputar
+      setTimeout(function() {
+        if (!isVideoSkipped) {
+          isVideoWatched = true;
+          // Jika video sudah ditonton selama 1 menit
+          claimReward();
+        }
+      }, 60000);  // 60,000 ms = 1 menit
+    };
+
+    // Fungsi untuk menskip video
+    function skipVideo() {
+      isVideoSkipped = true;
+      alert("Kamu menskip video, kamu tidak akan mendapatkan reward.");
+      // Bisa mengarahkan ke halaman lain atau memberi informasi lain
+    }
+
+    // Fungsi untuk memberikan reward setelah menonton video selama 1 menit
+    function claimReward() {
+      if (isVideoWatched) {
+        alert("🎉 Terima kasih telah menonton video selama 1 menit! Kamu mendapatkan reward!");
+
+        // Menghitung reward acak
+        const reward = Math.floor(Math.random() * (25 - 10 + 1)) + 10;  // Reward acak antara Rp10 - Rp25
+
+        // Kirim informasi ke backend atau bot untuk memberikan reward kepada pengguna
+        fetch("https://your-backend-url.com/verify_video", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            user_id: "USER_ID",  // Gantilah dengan ID pengguna yang valid
+            reward: reward
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            alert("Kamu mendapatkan reward sebesar Rp" + reward);
+          } else {
+            alert("Gagal memverifikasi video.");
+          }
+        })
+        .catch(error => console.error("Error:", error));
+      }
+    }
+
+    // Fungsi untuk menangani jika video ditutup atau diberhentikan secara manual
+    videoPlayer.onpause = function() {
+      if (!isVideoWatched) {
+        alert("Video dihentikan sebelum 1 menit, kamu tidak akan mendapatkan reward.");
+      }
+    };
+
+    videoPlayer.onended = function() {
+      if (!isVideoWatched) {
+        alert("Video selesai sebelum 1 menit, kamu tidak akan mendapatkan reward.");
+      }
+    };
+  </script>
+</body>
+</html>
