@@ -1,24 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <title>Tonton Video & Dapatkan Reward</title>
+  <meta charset="UTF-8">
+  <title>Tonton Video & Dapat Reward</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 20px; }
-    button { padding: 10px 20px; font-size: 16px; }
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #f9f9f9; }
+    h2 { margin-bottom: 20px; }
+    iframe { border-radius: 12px; border: none; }
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #00aaff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #aaa;
+    }
   </style>
   <script>
     const videoIds = [
-      "MzKpGbYFhhc", // contoh video 1
-      "3L4Qcq07LCY", // contoh video 2
-      "pw4LdlA9bkU"  // contoh video 3
+      "dQw4w9WgXcQ",  // Video 1
+      "3JZ_D3ELwOQ",  // Video 2
+      "L_jWHffIx5E"   // Video 3
     ];
 
     let isWatched = false;
     let timer;
 
     function getRandomVideoId() {
-      const randomIndex = Math.floor(Math.random() * videoIds.length);
-      return videoIds[randomIndex];
+      const index = Math.floor(Math.random() * videoIds.length);
+      return videoIds[index];
     }
 
     function startWatching() {
@@ -26,22 +40,21 @@
       const videoFrame = document.getElementById("videoFrame");
       const videoId = getRandomVideoId();
 
-      // Tampilkan video
-      videoFrame.src = `https://www.youtube.com/embed/3L4Qcq07LCY?autoplay=1&rel=0`;
+      // Load YouTube video
+      videoFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
 
-      // Mulai timer
+      // Start 60-second countdown
       watchBtn.disabled = true;
-      watchBtn.innerText = "Menonton... (60 detik)";
-      let countdown = 60;
+      let seconds = 60;
+      watchBtn.textContent = `Menonton... (${seconds} detik)`;
 
       timer = setInterval(() => {
-        countdown--;
-        watchBtn.innerText = `Menonton... (${countdown} detik)`;
-
-        if (countdown <= 0) {
+        seconds--;
+        watchBtn.textContent = `Menonton... (${seconds} detik)`;
+        if (seconds <= 0) {
           clearInterval(timer);
           isWatched = true;
-          watchBtn.innerText = "✅ Klaim Reward Rp10 - Rp25";
+          watchBtn.textContent = "✅ Klaim Reward";
           watchBtn.disabled = false;
           watchBtn.onclick = claimReward;
         }
@@ -51,12 +64,16 @@
     function claimReward() {
       if (isWatched) {
         const reward = Math.floor(Math.random() * (25 - 10 + 1)) + 10;
-        alert("🎉 Kamu mendapat reward sebesar Rp" + reward);
-        // Di sinilah kamu bisa kirim data ke backend bot
+        alert(`🎉 Kamu mendapatkan Rp${reward}!\nReward akan ditambahkan ke saldo kamu.`);
+        // Di sini kamu bisa kirim request ke server/bot Telegram
       }
     }
   </script>
 </head>
 <body>
-  <h2>🎬 Tonton Video Selama 1 Menit & Dapatkan Reward</h2>
-  <iframe id="videoFrame" width="
+  <h2>🎬 Tonton Video Selama 1 Menit & Dapatkan Reward!</h2>
+  <iframe id="videoFrame" width="100%" height="315" allowfullscreen></iframe>
+  <br><br>
+  <button id="watchButton" onclick="startWatching()">Tonton Sekarang</button>
+</body>
+</html>
