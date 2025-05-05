@@ -1,110 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini App - Watch Video for Reward</title>
-</head>
-<body>
-  <h1>Selamat datang di BigCat Mine!</h1>
-  <p>Silakan menonton video selama 1 menit dan dapatkan reward!</p>
-
-  <!-- Video player dengan tombol skip yang akan disembunyikan saat video diputar -->
-  <video id="video-player" width="640" height="360" controls>
-    <!-- Custom Video Link, bisa diganti dengan video lain -->
-    <source src="https://www.youtube.com/watch?v=6Y_VaEjhCG0&t=2s" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-
-  <!-- Tombol untuk melanjutkan atau menskip video (dibelakang layar) -->
-  <button id="skip-button" style="display:none;" onclick="skipVideo()">Skip Video</button>
-
+  <title>Tonton Video & Dapatkan Reward</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    button { padding: 10px 20px; font-size: 16px; }
+  </style>
   <script>
-    // Daftar video yang bisa dipilih secara acak
-    const videoLinks = [
-      "https://www.youtube.com/watch?v=3L4Qcq07LCY", // Ganti dengan link video 1
-      "https://www.youtube.com/watch?v=MzKpGbYFhhc&t=1s", // Ganti dengan link video 2
-      "https://www.youtube.com/watch?v=pw4LdlA9bkU&t=5s"  // Ganti dengan link video 3
+    const videoIds = [
+      "MzKpGbYFhhc", // contoh video 1
+      "3L4Qcq07LCY", // contoh video 2
+      "pw4LdlA9bkU"  // contoh video 3
     ];
 
-    // Pilih video secara acak
-    const videoPlayer = document.getElementById("video-player");
-    const randomVideo = videoLinks[Math.floor(Math.random() * videoLinks.length)];
-    videoPlayer.src = randomVideo;
+    let isWatched = false;
+    let timer;
 
-    // Variabel untuk mengontrol status video yang ditonton
-    let isVideoWatched = false;
-    let isVideoSkipped = false;
+    function getRandomVideoId() {
+      const randomIndex = Math.floor(Math.random() * videoIds.length);
+      return videoIds[randomIndex];
+    }
 
-    // Fungsi untuk memulai video
-    videoPlayer.onplay = function() {
-      // Reset status
-      isVideoWatched = false;
-      isVideoSkipped = false;
+    function startWatching() {
+      const watchBtn = document.getElementById("watchButton");
+      const videoFrame = document.getElementById("videoFrame");
+      const videoId = getRandomVideoId();
 
-      // Sembunyikan tombol skip
-      document.getElementById("skip-button").style.display = "none";
+      // Tampilkan video
+      videoFrame.src = `https://www.youtube.com/embed/3L4Qcq07LCY?autoplay=1&rel=0`;
 
-      // Mulai hitung durasi setelah video mulai diputar
-      setTimeout(function() {
-        if (!isVideoSkipped) {
-          isVideoWatched = true;
-          // Jika video sudah ditonton selama 1 menit
-          claimReward();
+      // Mulai timer
+      watchBtn.disabled = true;
+      watchBtn.innerText = "Menonton... (60 detik)";
+      let countdown = 60;
+
+      timer = setInterval(() => {
+        countdown--;
+        watchBtn.innerText = `Menonton... (${countdown} detik)`;
+
+        if (countdown <= 0) {
+          clearInterval(timer);
+          isWatched = true;
+          watchBtn.innerText = "✅ Klaim Reward Rp10 - Rp25";
+          watchBtn.disabled = false;
+          watchBtn.onclick = claimReward;
         }
-      }, 60000);  // 60,000 ms = 1 menit
-    };
-
-    // Fungsi untuk menskip video
-    function skipVideo() {
-      isVideoSkipped = true;
-      alert("Kamu menskip video, kamu tidak akan mendapatkan reward.");
-      // Bisa mengarahkan ke halaman lain atau memberi informasi lain
+      }, 1000);
     }
 
-    // Fungsi untuk memberikan reward setelah menonton video selama 1 menit
     function claimReward() {
-      if (isVideoWatched) {
-        alert("🎉 Terima kasih telah menonton video selama 1 menit! Kamu mendapatkan reward!");
-
-        // Menghitung reward acak
-        const reward = Math.floor(Math.random() * (25 - 10 + 1)) + 10;  // Reward acak antara Rp10 - Rp25
-
-        // Kirim informasi ke backend atau bot untuk memberikan reward kepada pengguna
-        fetch("https://your-backend-url.com/verify_video", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            user_id: "USER_ID",  // Gantilah dengan ID pengguna yang valid
-            reward: reward
-          })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === "success") {
-            alert("Kamu mendapatkan reward sebesar Rp" + reward);
-          } else {
-            alert("Gagal memverifikasi video.");
-          }
-        })
-        .catch(error => console.error("Error:", error));
+      if (isWatched) {
+        const reward = Math.floor(Math.random() * (25 - 10 + 1)) + 10;
+        alert("🎉 Kamu mendapat reward sebesar Rp" + reward);
+        // Di sinilah kamu bisa kirim data ke backend bot
       }
     }
-
-    // Fungsi untuk menangani jika video ditutup atau diberhentikan secara manual
-    videoPlayer.onpause = function() {
-      if (!isVideoWatched) {
-        alert("Video dihentikan sebelum 1 menit, kamu tidak akan mendapatkan reward.");
-      }
-    };
-
-    videoPlayer.onended = function() {
-      if (!isVideoWatched) {
-        alert("Video selesai sebelum 1 menit, kamu tidak akan mendapatkan reward.");
-      }
-    };
   </script>
-</body>
-</html>
+</head>
+<body>
+  <h2>🎬 Tonton Video Selama 1 Menit & Dapatkan Reward</h2>
+  <iframe id="videoFrame" width="
